@@ -81,6 +81,23 @@ class App(GNetAppBase):
 See `apps/testbridge/main.py` for a runnable example that exercises the whole
 bridge (sandbox files, user fields, network, gBalance, permission denials).
 
+### Bundled apps
+
+| App | What it does |
+| --- | --- |
+| `calculator` | Four-function calculator |
+| `notes` | Sandbox notes with a list of your saved notes (new/save/delete) |
+| `todo` | Per-user task list stored via user fields |
+| `stopwatch` | Lap-capable stopwatch |
+| `coinflip` | Bet on heads/tails and win 2x your bet |
+| `luckynumbers` | Bet gBalance on 1-10 and win 5x your bet |
+| `stonks` | Buy/sell virtual stocks whose prices drift, so you can grow or lose your gBalance |
+
+Every new user starts with a `default` debit card, so the money games work
+right away. Apps spend through `bridge.spend_gbalance(...)` and collect
+winnings through `bridge.award_gbalance(...)`, which is capped per transaction
+and per day so nothing can print money forever.
+
 ## Getting Started
 
 ```bash
@@ -96,7 +113,14 @@ gNet 2/
 ├── requirements.txt
 ├── style.qss             # Global stylesheet
 ├── apps/
-│   └── testbridge/       # Example app exercising the SDK
+│   ├── calculator/        # Four-function calculator
+│   ├── notes/             # Notes with saved-note manager
+│   ├── todo/              # Per-user task list
+│   ├── stopwatch/         # Lap stopwatch
+│   ├── coinflip/          # Bet on coin flips
+│   ├── luckynumbers/      # Number lottery game
+│   ├── stonks/            # Stock trading game
+│   └── testbridge/        # Example app exercising the SDK
 ├── core/
 │   ├── app_discovery.py  # Finds and loads apps at startup
 │   ├── app_store.py      # Fetches + downloads apps from a GitHub repo

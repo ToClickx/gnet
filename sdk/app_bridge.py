@@ -229,6 +229,57 @@ class AppBridge:
         self.check_permission(AppPermission.MODIFY_APP_METADATA)
         self.log_action(f"modify_app_metadata({kwargs})", True)
 
+    # --- gBalance read / spend / award helpers ---
+
+    def get_gbalance(self):
+        """Read the user's current gBalance."""
+        self.check_permission(AppPermission.READ_GBALANCE)
+        return self.current_user.gBalance
+
+    def get_default_card_id(self):
+        return self.current_user.get_default_debit_card_id()
+
+    def spend_gbalance(self, amount: float, card_id: str = None):
+        """Spend from the user's gBalance through a debit card (negative modify)."""
+        if amount <= 0:
+            raise PermissionError("Spend amount must be positive.")
+        if card_id is None:
+            card_id = self.current_user.get_default_debit_card_id()
+            if not card_id:
+                raise PermissionError("No debit card available to spend from.")
+        return self.modify_gbalance(-amount, card_id)
+
+    AWARD_CAP_PER_TRANSACTION = 1000.0
+    AWARD_CAP_PER_DAY = 5000.0
+
+    def award_gbalance(self, amount: float):
+        """Award winnings/earnings into the user's gBalance, capped per day."""
+        self.check_permission(AppPermission.MODIFY_GBALANCE)
+        if amount <= 0:
+            raise PermissionError("Award amount must be positive.")
+        if amount > self.AWARD_CAP_PER_TRANSACTION:
+            raise PermissionError(f"Award exceeds {self.AWARD_CAP_PER_TRANSACTION:g} per transaction.")
+
+        import datetime as _dt
+        today = _dt.datetime.utcnow().date().isoformat()
+        app_space = self.current_user.app_data.setdefault(self.app_id, {})
+        awards = app_space.get("_award_log", {})
+        day = awards.get("day")
+        total = awards.get("total", 0.0) if day == today else 0.0
+        if total + amount > self.AWARD_CAP_PER_DAY:
+            raise PermissionError("This app has reached its daily earning cap.")
+        awards["day"] = today
+        awards["total"] = round(total + amount, 2)
+        app_space["_award_log"] = awards
+
+        self.current_user.add_gbalance(
+            amount,
+            app_id=self.app_id,
+            description=f"Earnings from {self.app_id}",
+        )
+        self.current_user.set_app_data(self.app_id, "_award_log", awards)
+        self.log_action("award_gbalance", True, f"+{amount}")
+
     # --- Utility ---
 
     def list_app_files(self):

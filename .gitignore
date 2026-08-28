@@ -19,6 +19,7 @@ user/logs/
 user/*.json
 users/
 *.log
+crash.log
 config.json
 session.json
 

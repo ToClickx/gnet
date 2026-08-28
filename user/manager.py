@@ -12,6 +12,7 @@ class UserManager:
         if username in self.users:
             raise ValueError(f"User '{username}' already exists.")
         user = User(username, password)
+        self._ensure_default_card(user)
         self.users[username] = user
         user.save()
         return user
@@ -36,14 +37,25 @@ class UserManager:
             raise ValueError("User not found.")
         if not user.check_password(password):
             raise ValueError("Incorrect password.")
+        self._ensure_default_card(user)
         self._current_user = user
         return user
 
     def auto_login(self, username: str) -> User | None:
         user = self.get_user(username)
         if user:
+            self._ensure_default_card(user)
             self._current_user = user
         return user
+
+    # ---- helpers ----
+    @staticmethod
+    def _ensure_default_card(user: User) -> None:
+        if not user.debit_cards:
+            user.add_debit_card(
+                "default", "Default", limit_amount=1000.0,
+                limit_percent=1.0, time_window_seconds=86400,
+            )
 
     def logout(self) -> None:
         self._current_user = None

@@ -11,6 +11,7 @@ class UserProfilePage(QWidget):
     def __init__(self, main_window):
         super().__init__()
         self.main_window = main_window
+        self.user_manager = main_window.user_manager
 
         layout = QVBoxLayout(self)
         layout.setContentsMargins(40, 40, 40, 40)
@@ -71,6 +72,12 @@ class UserProfilePage(QWidget):
         layoutF.addRow("Username:", self.username_label)
         layoutF.addRow("gBalance:", self.balance_label)
         layoutF.addRow("Debit cards:", self.cards_label)
+
+        add_card_btn = QPushButton("Add Debit Card")
+        add_card_btn.setFixedWidth(140)
+        add_card_btn.clicked.connect(self.add_debit_card)
+        layoutF.addRow(add_card_btn)
+
         info_layout.addWidget(info_card)
 
         txn_group = QGroupBox("Recent Transactions")
@@ -102,7 +109,15 @@ class UserProfilePage(QWidget):
             self.info.show()
             self.username_label.setText(user.username)
             self.balance_label.setText(f"${user.gBalance:.2f}")
-            self.cards_label.setText(str(len(user.debit_cards)))
+            cards = user.debit_cards
+            if cards:
+                names = ", ".join(
+                    c["name"] if isinstance(c, dict) else str(c)
+                    for c in cards.values()
+                )
+                self.cards_label.setText(f"{len(cards)}: {names}")
+            else:
+                self.cards_label.setText("0")
 
             self.txn_list.clear()
             recent = list(reversed(user.transaction_log[-20:]))
@@ -118,6 +133,27 @@ class UserProfilePage(QWidget):
             self.auth_card.show()
             self.info.hide()
             self.auth_status.setText("")
+
+    def add_debit_card(self):
+        from PyQt6.QtWidgets import QInputDialog
+        user = self.main_window.user_manager.current_user()
+        if not user:
+            return
+        name, ok = QInputDialog.getText(self, "New debit card", "Card name:")
+        name = (name or "").strip()
+        if not ok or not name:
+            return
+        limit, ok = QInputDialog.getDouble(
+            self, "New debit card", "Limit per time window (max spend):",
+            100.0, 1.0, 100000.0, 2,
+        )
+        if not ok:
+            return
+        user.add_debit_card(
+            f"card_{name.lower().replace(' ', '_')}", name,
+            limit_amount=limit, limit_percent=1.0, time_window_seconds=86400,
+        )
+        self.refresh()
 
     def login(self):
         username = self.username_edit.text().strip()

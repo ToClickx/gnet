@@ -123,6 +123,7 @@ class AppBrowserPage(QWidget):
         super().__init__()
         self.main_window = main_window
         self.remote_apps = []
+        self._open_windows = []
 
         layout = QVBoxLayout(self)
         layout.setContentsMargins(24, 24, 24, 24)
@@ -337,11 +338,19 @@ class AppBrowserPage(QWidget):
                 widget.main()
             widget.on_open()
             widget.show()
+
+            # keep a Python reference so the window is not garbage collected
+            self._open_windows.append(widget)
+            widget.closed.connect(lambda w=widget: self._drop_window(w))
         except Exception:
             QMessageBox.critical(
                 self, "Open failed",
                 "The app crashed on launch:\n\n" + traceback.format_exc()
             )
+
+    def _drop_window(self, widget):
+        if widget in self._open_windows:
+            self._open_windows.remove(widget)
 
     @staticmethod
     def _build_manifest(app_info):

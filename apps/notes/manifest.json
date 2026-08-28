@@ -4,10 +4,10 @@
   "display_name": "Notes",
   "version": {
     "major": 1,
-    "minor": 0,
+    "minor": 1,
     "patch": 0
   },
-  "description": "Write notes stored in your app sandbox.",
+  "description": "Write and manage notes stored in your app sandbox.",
   "developer": "gNet",
   "permissions": [
     "READ_APP_FILES",

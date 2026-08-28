@@ -1,13 +1,13 @@
 {
-  "app_id": "coinflip",
-  "uuid": "bdf42d31-f733-4e65-8107-58a3528f996f",
-  "display_name": "Coin Flip",
+  "app_id": "stonks",
+  "uuid": "64d39924-6925-44e7-9edd-704edb497604",
+  "display_name": "Stonks",
   "version": {
     "major": 1,
-    "minor": 1,
+    "minor": 0,
     "patch": 0
   },
-  "description": "Flip a virtual coin and bet on the outcome.",
+  "description": "Buy and sell virtual stocks to grow your gBalance.",
   "developer": "gNet",
   "permissions": [
     "READ_USER_FIELD",

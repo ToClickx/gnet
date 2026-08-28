@@ -1,0 +1,18 @@
+{
+  "app_id": "luckynumbers",
+  "uuid": "7a10ba47-ff50-45ed-af16-c90d6c56b23a",
+  "display_name": "Lucky Numbers",
+  "version": {
+    "major": 1,
+    "minor": 0,
+    "patch": 0
+  },
+  "description": "Bet gBalance on a number 1-10 and win 5x your bet.",
+  "developer": "gNet",
+  "permissions": [
+    "READ_USER_FIELD",
+    "WRITE_USER_FIELD",
+    "READ_GBALANCE",
+    "MODIFY_GBALANCE"
+  ]
+}
