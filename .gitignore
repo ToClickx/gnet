@@ -20,6 +20,7 @@ user/*.json
 users/
 *.log
 config.json
+session.json
 
 # OS / IDE
 .DS_Store

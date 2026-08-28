@@ -32,6 +32,20 @@ class User:
     def get_card_manager(self) -> DebitCardManager:
         return DebitCardManager(self)
 
+    # ---- Generic field access (used by AppBridge / legacy code) ----
+    def get_field(self, key: str, default=None):
+        return getattr(self, key, default)
+
+    def set_field(self, key: str, value) -> None:
+        setattr(self, key, value)
+        self.save()
+
+    def get_default_debit_card_id(self):
+        enabled = [cid for cid, card in self.debit_cards.items() if card.get("enabled", False)]
+        if enabled:
+            return enabled[0]
+        return next(iter(self.debit_cards), None)
+
     def _hash_password(self, password: str) -> str:
         return hashlib.sha256(password.encode()).hexdigest()
 

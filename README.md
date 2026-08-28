@@ -28,7 +28,8 @@ through a locked-down `AppBridge`.
   - Violations are logged per-app, so apps can never silently exceed their
     grants
 - **User accounts** — password-hashed login, persistent profile/app data,
-  transaction logs, and debit-card management
+  transaction logs, and debit-card management. Login supports "Remember me"
+  so you can skip password entry on the next launch
 - **UI** — dark-themed launcher with Home, Apps, Settings, and Profile pages
   styled by a shared `style.qss` stylesheet
 

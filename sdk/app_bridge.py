@@ -119,60 +119,6 @@ class AppBridge:
             self.log_action(f"delete_file({path})", False, str(e))
             raise
 
-    # --- App Metadata ---
-
-    def modify_gbalance(self, amount: float, card_id: str):
-        self.check_permission(AppPermission.MODIFY_GBALANCE)
-
-        card = self.current_user.get_debit_card(card_id)
-        if not card or not card.is_enabled:
-            raise PermissionError(f"Invalid or disabled debit card: {card_id}")
-
-        gBalance = self.current_user.get_field("gBalance", 0)
-
-        # --- App-wide spending % limit ---
-        max_percent = self.manifest.gbalance_spend_limit_percent or 0
-        max_allowed = gBalance * (max_percent / 100.0)
-        app_spend_key = f"_app_spent::{self.app_id}"
-        app_spent = self.current_user.get_field(app_spend_key, 0)
-
-        if amount > 0:
-            raise PermissionError("Apps cannot increase gBalance directly.")
-
-        # Negative amount = debit, so compare against app limit
-        if abs(app_spent + amount) > max_allowed:
-            raise PermissionError(f"App {self.app_id} exceeded its gBalance spending limit ({max_percent}%)")
-
-        # --- Card hard cap & time window logic ---
-        now = time.time()
-        window = card.time_window_sec
-        card_spend_key = f"_card_spend_history::{card.card_id}"
-        history = self.current_user.get_field(card_spend_key, [])
-        history = [t for t in history if now - t < window]  # purge old
-
-        if len(history) >= card.hard_cap:
-            raise PermissionError(f"Debit card {card.card_id} exceeded its hard cap of {card.hard_cap} in last {window}s.")
-
-        # --- Sufficient balance check ---
-        new_balance = gBalance + amount
-        if new_balance < 0:
-            raise PermissionError("Insufficient gBalance.")
-
-        # --- Apply changes ---
-        self.current_user.set_field("gBalance", new_balance)
-        self.current_user.set_field(app_spend_key, app_spent + amount)
-
-        history.append(now)
-        self.current_user.set_field(card_spend_key, history)
-
-        self.current_user.save()
-
-        self.current_user.log_transaction(
-            type_="app_gbalance_modification",
-            amount=amount,
-            description=f"App {self.app_id} modified gBalance by {amount} via card {card_id}"
-        )
-
     # --- Network Operations ---
 
     def http_get(self, url: str, params=None, headers=None):
@@ -228,61 +174,60 @@ class AppBridge:
 
     def get_user_field(self, key: str):
         self.check_permission(AppPermission.READ_USER_FIELD)
-        app_data = self._get_app_data_dict(create=False)
-        return app_data.get(key)
+        return self.current_user.get_app_data(self.app_id, key)
 
     def set_user_field(self, key: str, value):
         self.check_permission(AppPermission.WRITE_USER_FIELD)
-        app_data = self._get_app_data_dict(create=True)
-        app_data[key] = value
-        self.current_user.set_field("app_data", app_data)  # save whole app data subdict
-        self.current_user.save()
+        self.current_user.set_app_data(self.app_id, key, value)
 
     def delete_user_field(self, key: str):
         self.check_permission(AppPermission.DELETE_USER_FIELD)
-        app_data = self._get_app_data_dict(create=False)
-        if key in app_data:
-            del app_data[key]
-            self.current_user.set_field("app_data", app_data)
-            self.current_user.save()
+        self.current_user.delete_app_data_key(self.app_id, key)
 
-    def _get_app_data_dict(self, create=False):
-        # Each app’s data is stored under user.data["app_data"][app_id]
-        app_data = self.current_user.get_field("app_data", {})
-        if self.app_id not in app_data:
-            if create:
-                app_data[self.app_id] = {}
-            else:
-                return {}
-        return app_data[self.app_id]
+    def list_user_fields(self) -> list:
+        self.check_permission(AppPermission.READ_USER_FIELD)
+        app_space = self.current_user.app_data.get(self.app_id, {})
+        return list(app_space.keys())
 
     # --- gBalance Operations ---
 
     def modify_gbalance(self, amount: float, card_id: str):
+        """Spend money from a user's gBalance through an enabled debit card."""
+        from user.debit_card_manager import DebitCardManager
+
         self.check_permission(AppPermission.MODIFY_GBALANCE)
-        card = self.current_user.get_debit_card(card_id)
-        if not card or not card.is_enabled:
+
+        if amount > 0:
+            self.log_action("modify_gbalance", False, "positive amount")
+            raise PermissionError("Apps cannot increase gBalance directly.")
+
+        card = self.current_user.debit_cards.get(card_id)
+        if not card or not card.get("enabled", False):
             raise PermissionError(f"Invalid or disabled debit card: {card_id}")
 
-        # Check limits: amount and % of user balance in card’s time window
-        if not card.can_spend(amount, self.current_user.get_field("gBalance", 0)):
-            raise PermissionError(f"Debit card limit exceeded for amount: {amount}")
+        spend = abs(amount)
+        if not DebitCardManager.can_spend(self.current_user, card_id, spend):
+            self.log_action("modify_gbalance", False, "card limit hit")
+            raise PermissionError(f"Debit card {card_id} limit exceeded for spend {spend}.")
 
-        new_balance = self.current_user.get_field("gBalance", 0) + amount
-        if new_balance < 0:
-            raise PermissionError("Insufficient gBalance")
+        try:
+            self.current_user.log_card_spend(card_id, spend)
+            self.current_user.subtract_gbalance(
+                spend,
+                app_id=self.app_id,
+                card_id=card_id,
+                description=f"App {self.app_id} spent {spend} via card {card_id}",
+            )
+        except ValueError as e:
+            raise PermissionError(str(e))
 
-        # Update gBalance
-        self.current_user.set_field("gBalance", new_balance)
-        card.record_spend(amount)
-        self.current_user.save()
+        self.log_action("modify_gbalance", True, f"{spend} via {card_id}")
 
-        # Log transaction (with card and app info)
-        self.current_user.log_transaction(
-            type_="app_gbalance_modification",
-            amount=amount,
-            description=f"App {self.app_id} modified gBalance by {amount} via card {card_id}"
-        )
+    # --- Metadata (dev mode) ---
+
+    def modify_app_metadata(self, **kwargs):
+        self.check_permission(AppPermission.MODIFY_APP_METADATA)
+        self.log_action(f"modify_app_metadata({kwargs})", True)
 
     # --- Utility ---
 

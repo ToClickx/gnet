@@ -1,8 +1,10 @@
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton,
-    QGroupBox, QFormLayout, QListWidget, QListWidgetItem,
+    QGroupBox, QFormLayout, QListWidget, QListWidgetItem, QCheckBox,
 )
 from PyQt6.QtCore import Qt
+
+import core.session as session
 
 
 class UserProfilePage(QWidget):
@@ -32,6 +34,9 @@ class UserProfilePage(QWidget):
         self.password_edit.setEchoMode(QLineEdit.EchoMode.Password)
         auth_form.addRow("Username:", self.username_edit)
         auth_form.addRow("Password:", self.password_edit)
+
+        self.remember_check = QCheckBox("Remember me")
+        auth_form.addRow(self.remember_check)
 
         auth_btns = QHBoxLayout()
         login_btn = QPushButton("Log In")
@@ -118,13 +123,14 @@ class UserProfilePage(QWidget):
         username = self.username_edit.text().strip()
         password = self.password_edit.text()
         try:
-            self.main_window.user_manager.login(username, password)
+            self.user_manager.login(username, password)
         except ValueError as e:
             self.auth_status.setText(str(e))
             return
+        self._apply_remember(username)
         self.username_edit.clear()
         self.password_edit.clear()
-        self.main_window.on_user_changed()
+        self.user_manager_changed()
 
     def register(self):
         username = self.username_edit.text().strip()
@@ -133,15 +139,26 @@ class UserProfilePage(QWidget):
             self.auth_status.setText("Username and password required.")
             return
         try:
-            self.main_window.user_manager.create_user(username, password)
-            self.main_window.user_manager.login(username, password)
+            self.user_manager.create_user(username, password)
+            self.user_manager.login(username, password)
         except ValueError as e:
             self.auth_status.setText(str(e))
             return
+        self._apply_remember(username)
         self.username_edit.clear()
         self.password_edit.clear()
-        self.main_window.on_user_changed()
+        self.user_manager_changed()
 
     def logout(self):
-        self.main_window.user_manager.logout()
+        session.clear()
+        self.user_manager.logout()
+        self.user_manager_changed()
+
+    def _apply_remember(self, username):
+        if self.remember_check.isChecked():
+            session.save(username)
+        else:
+            session.clear()
+
+    def user_manager_changed(self):
         self.main_window.on_user_changed()

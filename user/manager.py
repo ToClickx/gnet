@@ -39,6 +39,12 @@ class UserManager:
         self._current_user = user
         return user
 
+    def auto_login(self, username: str) -> User | None:
+        user = self.get_user(username)
+        if user:
+            self._current_user = user
+        return user
+
     def logout(self) -> None:
         self._current_user = None
 

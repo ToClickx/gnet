@@ -8,6 +8,7 @@ from PyQt6.QtCore import Qt
 from user.manager import UserManager
 from core.settings import AppSettings
 from core.app_manager import AppManager
+from core import session
 from ui.home_page import HomePage
 from ui.app_browser_page import AppBrowserPage
 from ui.settings_page import SettingsPage
@@ -28,6 +29,8 @@ class MainWindow(QMainWindow):
         self.settings = AppSettings()
         self.user_manager = UserManager()
         self.app_manager = AppManager()
+
+        self._restore_session()
 
         # Set up main widget and layout
         main_widget = QWidget()
@@ -92,6 +95,7 @@ class MainWindow(QMainWindow):
         # Apply custom style
         self.setStyleSheet(style)
 
+        self.on_user_changed()
         self.show_page("home")
 
     def show_page(self, key: str):
@@ -126,3 +130,8 @@ class MainWindow(QMainWindow):
             self.user_label.setText("Not logged in")
         self.home_page.refresh()
         self.profile_page.refresh()
+
+    def _restore_session(self):
+        remembered = session.load()
+        if remembered:
+            self.user_manager.auto_login(remembered)
