@@ -1,0 +1,16 @@
+{
+  "app_id": "coinflip",
+  "uuid": "bdf42d31-f733-4e65-8107-58a3528f996f",
+  "display_name": "Coin Flip",
+  "version": {
+    "major": 1,
+    "minor": 0,
+    "patch": 0
+  },
+  "description": "Flip a virtual coin and track the streak.",
+  "developer": "gNet",
+  "permissions": [
+    "READ_USER_FIELD",
+    "WRITE_USER_FIELD"
+  ]
+}

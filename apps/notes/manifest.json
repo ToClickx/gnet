@@ -1,0 +1,16 @@
+{
+  "app_id": "notes",
+  "uuid": "8e786cd1-b9ff-41bf-8e9d-983359d0ea28",
+  "display_name": "Notes",
+  "version": {
+    "major": 1,
+    "minor": 0,
+    "patch": 0
+  },
+  "description": "Write notes stored in your app sandbox.",
+  "developer": "gNet",
+  "permissions": [
+    "READ_APP_FILES",
+    "WRITE_APP_FILES"
+  ]
+}

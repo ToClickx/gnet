@@ -1,0 +1,13 @@
+{
+  "app_id": "stopwatch",
+  "uuid": "d20c5f45-b102-473c-82a3-c311341bb27a",
+  "display_name": "Stopwatch",
+  "version": {
+    "major": 1,
+    "minor": 0,
+    "patch": 0
+  },
+  "description": "A lap-capable stopwatch.",
+  "developer": "gNet",
+  "permissions": []
+}

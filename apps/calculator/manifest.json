@@ -1,0 +1,13 @@
+{
+  "app_id": "calculator",
+  "uuid": "4d0f9e19-afb3-4dbb-bdc2-00ca54459ddb",
+  "display_name": "Calculator",
+  "version": {
+    "major": 1,
+    "minor": 0,
+    "patch": 0
+  },
+  "description": "A simple four-function calculator.",
+  "developer": "gNet",
+  "permissions": []
+}

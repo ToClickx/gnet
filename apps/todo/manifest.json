@@ -1,0 +1,17 @@
+{
+  "app_id": "todo",
+  "uuid": "d5d046f6-c832-43db-99be-b127071940bf",
+  "display_name": "To-Do",
+  "version": {
+    "major": 1,
+    "minor": 0,
+    "patch": 0
+  },
+  "description": "A personal to-do list stored per user.",
+  "developer": "gNet",
+  "permissions": [
+    "READ_USER_FIELD",
+    "WRITE_USER_FIELD",
+    "READ_USERNAME"
+  ]
+}
