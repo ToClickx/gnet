@@ -2,7 +2,6 @@ import os
 from PyQt6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QFont
-import qdarktheme
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STYLE_QSS = os.path.join(BASE_DIR, "style.qss")

@@ -1,15 +1,16 @@
 import sys
-import qdarktheme
 from PyQt6.QtWidgets import QApplication
 from ui.main_window import MainWindow
 
 def main():
     app = QApplication(sys.argv)
-    qdarktheme.setup_theme("dark")
-    
+
+    from ui.main_window import style
+    app.setStyleSheet(style)
+
     window = MainWindow()
     window.show()
-    
+
     sys.exit(app.exec())
 
 if __name__ == "__main__":

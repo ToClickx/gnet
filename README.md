@@ -27,7 +27,7 @@ through a locked-down `AppBridge`.
 - **User accounts** — password-hashed login, persistent profile/app data,
   transaction logs, and debit-card management
 - **UI** — dark-themed launcher with Home, Apps, Settings, and Profile pages
-  (`qdarktheme` + a shared QSS stylesheet)
+  styled by a shared `style.qss` stylesheet
 
 ## The permission model
 
