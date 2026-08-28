@@ -67,11 +67,11 @@ class AppManifest:
             uuid=UUID(d["uuid"]),
             display_name=d["display_name"],
             description=d.get("description", ""),
-            developer=d["developer"],
+            developer=d.get("developer", ""),
             version=SemanticVersion.from_dict(d["version"]),
-            icon_path=d["icon_path"],
-            entry_point=d["entry_point"],
-            permissions=[AppPermission[p] for p in d["permissions"]]
+            icon_path=d.get("icon_path", ""),
+            entry_point=d.get("entry_point", "main.py"),
+            permissions=[AppPermission[p] for p in d.get("permissions", [])]
         )
 
     @classmethod

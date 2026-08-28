@@ -1,10 +1,9 @@
 # sdk/app_base.py
 
 from PyQt6.QtWidgets import QWidget
-from abc import ABC, abstractmethod
 
 
-class GNetAppBase(QWidget, ABC):
+class GNetAppBase(QWidget):
     """
     Base class all gNet apps must inherit from.
 
@@ -12,23 +11,19 @@ class GNetAppBase(QWidget, ABC):
     rather than direct access to user data or system APIs.
     """
 
+    # Display metadata - apps override these as class attributes
+    app_name = "Untitled App"
+    app_id = "unknown"
+    app_version = "0.0.0"
+    app_description = ""
+    app_icon = None
+
     def __init__(self, app_bridge, parent=None):
         super().__init__(parent)
         self.bridge = app_bridge
 
-    @abstractmethod
-    def app_name(self) -> str:
-        """Returns the human-readable name of the app."""
-        pass
-
-    @abstractmethod
-    def app_id(self) -> str:
-        """Returns the unique app ID (e.g. 'com.example.myapp')"""
-        pass
-
-    @abstractmethod
-    def app_version(self) -> str:
-        """Returns the app version as a string (e.g. '1.0.0')"""
+    def main(self):
+        """Entry point called when the app is launched. Override if needed."""
         pass
 
     def on_open(self):

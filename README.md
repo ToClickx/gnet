@@ -13,6 +13,9 @@ through a locked-down `AppBridge`.
 
 - **App model** — apps are plain folders under `apps/` with a `main.py` entry
   point, discovered and loaded at launch
+- **App Store** — the Apps page has an "Installed" list plus a Store tab that
+  loads apps from the `apps/` folder of a GitHub repository (each app folder is
+  downloaded into `apps/`), so anyone can distribute apps through the repo
 - **Manifest system** — each app ships a `manifest.json` declaring its stable
   `uuid`, semantic version, developer, and the `AppPermission`s it requests
 - **Permission-gated `AppBridge`** — the only way an app reaches the outside
@@ -66,6 +69,14 @@ class App(GNetAppBase):
 
 3. Run `python main.py` — the app is discovered automatically.
 
+### Installing apps from the store
+
+1. Open the **Apps** page and go to the **Store** tab.
+2. The default store points at `ToClickx/gnet` on GitHub (branch `main`).
+3. Press **Load** to fetch the list of app folders in that repo's `apps/`
+   directory, then press **Install** next to any app to download it.
+4. Change the owner/repo/branch in **Settings** to use your own GitHub repo.
+
 See `apps/testbridge/main.py` for a runnable example that exercises the whole
 bridge (sandbox files, user fields, network, gBalance, permission denials).
 
@@ -86,7 +97,9 @@ gNet 2/
 ├── apps/
 │   └── testbridge/       # Example app exercising the SDK
 ├── core/
-│   └── app_discovery.py  # Finds and loads apps at startup
+│   ├── app_discovery.py  # Finds and loads apps at startup
+│   ├── app_store.py      # Fetches + downloads apps from a GitHub repo
+│   └── app_manager.py    # Installed-app list, install/uninstall, refresh
 ├── sdk/
 │   ├── app_base.py       # GNetAppBase — all apps subclass this
 │   ├── app_bridge.py     # Permission-enforcing sandbox API
