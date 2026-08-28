@@ -1,0 +1,109 @@
+* {
+    font-family: 'Fira Code', monospace;
+    color: #dddddd;
+    background-color: #1e1e1e;
+    border: none;
+}
+
+QMainWindow {
+    background-color: #1e1e1e;
+}
+
+QTextEdit {
+    background-color: #2a2a2a;
+    border-radius: 12px;
+    padding: 10px;
+    color: #eeeeee;
+}
+
+QPlainTextEdit {
+    background-color: #2a2a2a;
+    border-radius: 12px;
+    padding: 10px;
+    color: #ffffff;
+}
+
+QPlainTextEdit:focus {
+    border: 2px solid #3b82f6;
+}
+
+/* Enhanced Scrollbar Styling */
+QScrollBar:vertical {
+    background: #1e1e1e;
+    width: 14px;
+    margin: 4px;
+    border-radius: 7px;
+}
+QScrollBar::handle:vertical {
+    background: #444;
+    min-height: 20px;
+    border-radius: 7px;
+}
+QScrollBar::handle:vertical:hover {
+    background: #666;
+}
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+    border: none;
+    background: none;
+}
+QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+    background: none;
+}
+
+QScrollBar:horizontal {
+    background: #1e1e1e;
+    height: 14px;
+    margin: 4px;
+    border-radius: 7px;
+}
+QScrollBar::handle:horizontal {
+    background: #444;
+    min-width: 20px;
+    border-radius: 7px;
+}
+QScrollBar::handle:horizontal:hover {
+    background: #666;
+}
+QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
+    border: none;
+    background: none;
+}
+QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {
+    background: none;
+}
+
+QsciScintilla {
+    background-color: #1e1e1e;
+    color: #dddddd;
+    border-radius: 12px;
+    padding: 10px;
+}
+
+QPushButton {
+    background-color: #3b82f6;
+    color: #ffffff;
+    border-radius: 12px;
+    padding: 10px 20px;
+    border: none;
+}
+QPushButton:hover {
+    background-color: #2563eb;
+}
+QPushButton:pressed {
+    background-color: #1d4ed8;
+}
+
+QMenuBar {
+    background-color: #2a2a2a;
+    color: #dddddd;
+    border-radius: 12px;
+}
+QMenu {
+    background-color: #2a2a2a;
+    color: #dddddd;
+    border: 1px solid #444;
+    border-radius: 12px;
+}
+QMenu::item:selected {
+    background-color: #3b82f6;
+}

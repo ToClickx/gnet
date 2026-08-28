@@ -1,0 +1,22 @@
+{
+  "app_id": "testbridge",
+  "uuid": "123e4567-e89b-12d3-a456-426614174000",
+  "display_name": "AppBridge Tester",
+  "version": {
+    "major": 1,
+    "minor": 0,
+    "patch": 0
+  },
+  "description": "Test various AppBridge features.",
+  "developer": "TestDev",
+  "permissions": [
+    "READ_APP_FILES",
+    "WRITE_APP_FILES",
+    "READ_GLOBAL_FILES",
+    "READ_USERNAME",
+    "WRITE_USER_FIELD",
+    "READ_USER_FIELD",
+    "ACCESS_INTERNET",
+    "MODIFY_GBALANCE"
+  ]
+}
