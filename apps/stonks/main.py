@@ -81,16 +81,12 @@ class App(GNetAppBase):
         self.refresh()
 
     def current_holding(self):
+        """Ticker of the currently selected stock row, or None."""
         it = self.stock_list.currentItem()
         if it is None:
             return None
-        text = it.text().strip()
-        # line format: "NAME  $12.34  (x shares = $y)"
-        name = text.split()[0]
+        name = it.data(Qt.ItemDataRole.UserRole)
         return name if name in self.prices else None
-
-    def value_of(self, name):
-        return self.holdings.get(name, 0.0) * self.prices.get(name, 0.0)
 
     def refresh(self):
         bal = 0.0
@@ -100,12 +96,19 @@ class App(GNetAppBase):
             pass
         self.balance_label.setText(f"gBalance: ${bal:.2f}")
 
+        # Keep the selection when price ticks rebuild the list.
+        selected = self.current_holding()
+
         self.stock_list.clear()
         for name, price in self.prices.items():
             shares = self.holdings.get(name, 0)
-            self.stock_list.addItem(
-                QListWidgetItem(f"{name}  ${price:6.2f}   ({shares} shares = ${price*shares:.2f})")
+            item = QListWidgetItem(
+                f"{name}  ${price:6.2f}   ({shares} shares = ${price*shares:.2f})"
             )
+            item.setData(Qt.ItemDataRole.UserRole, name)
+            self.stock_list.addItem(item)
+            if name == selected:
+                self.stock_list.setCurrentItem(item)
         self.update_portfolio(bal)
 
     def update_portfolio(self, bal=None):
